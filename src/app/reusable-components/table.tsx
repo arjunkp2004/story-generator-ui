@@ -1,65 +1,56 @@
-import Image from "next/image";
+interface Header {
+  key: string;
+  label: string;
+}
 
-export default function Table({dataHeaders, data}: {
-    dataHeaders: any[];
-    data: any[];
-  }) {
-//   let dataHeaders = ["Email", "Name", "Mobile", "Status", "Actions"];
-//   let data = [
-//     { email: "prijesh@gmail.com", name: "Prijesh", phone: 999999, active: true },
-//     { email: "rajesh@gmail.com", name: "Rajesh", phone: 77777, active: false },
-//     { email: "arjun@gmail.com", name: "Arjun", phone: 88888, active: true },
-//     { email: "rahul@gmail.com", name: "Rahul", phone: 88888, active: true }
-//   ];
-
+export default function Table<T extends Record<string, unknown>>({
+  dataHeaders,
+  data,
+}: {
+  dataHeaders: Header[];
+  data: T[];
+}) {
   return (
     <table className="table-fixed border-collapse border border-gray-300 w-full text-left">
       <thead>
         <tr>
-            {
-                dataHeaders.map(h => {
-                    return <th className="border border-gray-300 px-4 py-2">{h.label}</th>
-                })
-            }
+          {dataHeaders.map((h) => (
+            <th key={h.key} className="border border-gray-300 px-4 py-2">
+              {h.label}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>
-      {
-        data.map(d => {
-          return <tr className="hover:bg-gray-100">
-            {
-                dataHeaders.map(h => {
-                    if(h.key === 'active') {
-                        return <td className="border border-gray-300 px-4 py-2">
-                        <span
-                            className={`px-2 py-1 rounded text-white text-sm ${
-                              d.active ? "bg-green-500" : "bg-red-500"
-                            }`}
-                          >
-                            {d.active ? "Active" : "Disabled"}
-                        </span>
-                      </td>
-                    } 
-                    return <td className="border border-gray-300 px-4 py-2">{d[h.key]}</td>
-                })
-            }
-            {/* <td className="border border-gray-300 px-4 py-2">{d[dataHeaders[0].key]}</td>
-            <td className="border border-gray-300 px-4 py-2">{d[dataHeaders[1].key]}</td>
-            <td className="border border-gray-300 px-4 py-2">{d[dataHeaders[2].key]}</td> */}
-            {/* <td className="border border-gray-300 px-4 py-2">
-              <span
-                  className={`px-2 py-1 rounded text-white text-sm ${
-                    d.active ? "bg-green-500" : "bg-red-500"
-                  }`}
-                >
-                  {d.active ? "Active" : "Disabled"}
-              </span>
-            </td> */}
+        {data.map((d, i) => (
+          <tr key={i} className="hover:bg-gray-100">
+            {dataHeaders.map((h) => {
+              if (h.key === "active") {
+                return (
+                  <td key={h.key} className="border border-gray-300 px-4 py-2">
+                    <span
+                      className={`px-2 py-1 rounded text-white text-sm ${
+                        d[h.key] ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    >
+                      {d[h.key] ? "Active" : "Disabled"}
+                    </span>
+                  </td>
+                );
+              }
+              return (
+                <td key={h.key} className="border border-gray-300 px-4 py-2">
+                  {d[h.key]}
+                </td>
+              );
+            })}
             <td className="border border-gray-300 px-4 py-2">
-            <div className="flex space-x-2">
+              <div className="flex space-x-2">
                 <button
                   className={`px-3 py-1 text-white text-sm rounded ${
-                    d.active ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                    d.active
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-green-500 hover:bg-green-600"
                   }`}
                 >
                   {d.active ? "Deactivate" : "Activate"}
@@ -72,12 +63,9 @@ export default function Table({dataHeaders, data}: {
                 </button>
               </div>
             </td>
-            
           </tr>
-        })
-      }
+        ))}
       </tbody>
-      
     </table>
   );
 }
