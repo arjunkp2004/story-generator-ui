@@ -4,6 +4,7 @@ import Button from "../reusable-components/Button";
 
 export default function Generate() {
   const [story, setStory] = useState("initial story");
+  const [posterUrl, setPosterUrl] = useState("");
   const [storyConcept, setStoryConcept] = useState("initial concept");
   const [isGeneratePoster, setIsGeneratePoster] = useState(true);
   const [isGenEachPageImg, setIsGenEachPageImg] = useState(true);
@@ -20,7 +21,12 @@ export default function Generate() {
   };
 
   const onGenerate = () => {
-    setStory("some new story generated");
+    generateStory();
+    if (isGeneratePoster) {
+      generatePoster();
+    }
+
+    // setStory("some new story generated");
   };
 
   const onRegenerateClear = () => {
@@ -31,7 +37,61 @@ export default function Generate() {
   };
 
   const onRegenerate = () => {
-    setStory("Regenerated new story");
+    generateStory();
+    if (isReGenPoster) {
+      generatePoster();
+    }
+  };
+
+  const generateStory = async () => {
+    try {
+      debugger;
+      const response = await fetch("http://127.0.0.1:8000/generate/story", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: storyConcept,
+        }),
+      });
+      debugger;
+      const data = await response.json();
+      setStory(data.story);
+
+      if (!response.ok) {
+        throw new Error("Failed to generate story");
+      }
+    } catch (error) {
+      setStory("Failed to generate story. Please try again...");
+      console.error("Error generating story:", error);
+    }
+  };
+
+  const generatePoster = async () => {
+    try {
+      debugger;
+      const response = await fetch("http://127.0.0.1:8000/generate/poster", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: storyConcept,
+        }),
+      });
+      debugger;
+      const data = await response.blob();
+      const posterUrl = URL.createObjectURL(data);
+      setPosterUrl(posterUrl);
+
+      if (!response.ok) {
+        throw new Error("Failed to generate poster");
+      }
+    } catch (error) {
+      setPosterUrl("");
+      console.error("Error generating poster:", error);
+    }
   };
 
   return (
@@ -60,7 +120,7 @@ export default function Generate() {
             </label>
           </div>
 
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <input
               type="checkbox"
               id="generatePageImages"
@@ -72,7 +132,7 @@ export default function Generate() {
             <label htmlFor="generatePageImages" className="text-gray-700">
               Generate Each Page Image
             </label>
-          </div>
+          </div> */}
         </div>
 
         <div className="mt-6 flex space-x-4">
@@ -96,11 +156,21 @@ export default function Generate() {
         <h2 className="text-xl font-bold mb-4">Generated Story</h2>
         <div className="mb-4">
           <img
-            src="https://cdn.pixabay.com/photo/2025/01/26/20/33/robin-9361610_1280.jpg"
+            src="poster.png"
             alt="Generated visual"
             className="w-full h-60 object-cover rounded-lg shadow-sm"
           />
         </div>
+        {posterUrl && (
+          <div className="mb-4">
+            <img
+              src={posterUrl}
+              alt="Generated visual"
+              className="w-full h-60 object-cover rounded-lg shadow-sm"
+            />
+          </div>
+        )}
+
         <p className="text-gray-700 mb-4">{story}</p>
 
         <div className="space-y-3">
@@ -118,7 +188,7 @@ export default function Generate() {
             </label>
           </div>
 
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <input
               type="checkbox"
               id="regeneratePageImages"
@@ -129,7 +199,7 @@ export default function Generate() {
             <label htmlFor="regeneratePageImages" className="text-gray-700">
               Generate Each Page Image
             </label>
-          </div>
+          </div> */}
 
           <div className="flex items-center">
             <input
